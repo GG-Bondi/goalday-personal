@@ -1,0 +1,15 @@
+{
+  "name":"GoalDay Personal",
+  "short_name":"GoalDay",
+  "description":"个人周计划、清单、日记与本子视图",
+  "start_url":"./index.html",
+  "display":"standalone",
+  "background_color":"#f2eee7",
+  "theme_color":"#e9ded7",
+  "orientation":"portrait",
+  "lang":"zh-CN",
+  "icons":[
+    {"src":"icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"icon-512.png","sizes":"512x512","type":"image/png"}
+  ]
+}

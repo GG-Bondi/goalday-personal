@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#e9ded7">
+<title>GoalDay Personal · 个人版</title>
+<style>
+:root{
+  --bg:#f8f6f2; --bar:#e9ded7; --ink:#171717; --muted:#aaa5a1;
+  --line:#ddd6d0; --card:#fff; --accent:#efd47b; --accent2:#f29db2;
+  --nav:#e9ded7; --shadow:0 10px 35px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;background:#111}
+button,input,textarea{font:inherit}
+button{border:0;background:none;color:inherit}
+.app{height:100%;max-width:520px;margin:auto;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.top{height:72px;background:var(--bar);display:flex;align-items:end;padding:0 18px 13px;gap:17px;flex-shrink:0}
+.top button{font-size:20px;color:#bcb6b2}
+.top button.active{color:#111;font-weight:700}
+.sep{color:#aaa;font-size:19px}
+.view{flex:1;min-height:0;overflow:auto;position:relative}
+.nav{height:76px;background:var(--nav);display:flex;justify-content:space-around;align-items:center;flex-shrink:0;border-top:1px solid rgba(0,0,0,.05)}
+.nav button{width:25%;height:100%;font-size:30px;display:flex;align-items:center;justify-content:center}
+.icon{font-size:28px;line-height:1}
+.week{height:100%;display:grid;grid-template-columns:55% 45%;overflow:hidden}
+.days{overflow:auto}
+.day{min-height:118px;border-bottom:1px solid var(--line);position:relative;padding:18px 18px 12px}
+.day .date{font-size:34px;line-height:1}
+.day .dow{font-size:16px;margin-top:4px}
+.day.today .date{background:#050505;color:white;border-radius:13px;padding:8px 11px;display:inline-block}
+.daytask{position:absolute;left:118px;right:8px;top:49px;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.daytask .sq{display:inline-block;width:18px;height:18px;border:1px solid var(--accent);border-radius:4px;vertical-align:-3px;margin-right:7px}
+.daytask.done{color:#e9c968;text-decoration:line-through}
+.todos{border-left:1px solid var(--line);overflow:auto;padding:24px 12px}
+.list-select{border:1px solid #d7d0ca;border-radius:13px;padding:10px 13px;background:rgba(255,255,255,.55);display:flex;align-items:center;gap:9px;font-size:17px;position:sticky;top:0;z-index:3}
+.dot{width:18px;height:18px;border-radius:50%;background:var(--accent);display:inline-block;flex:none}
+.todo{padding:10px 5px;font-size:18px;display:flex;gap:8px;align-items:flex-start}
+.todo .box{width:9px;height:9px;background:var(--accent);margin-top:9px;flex:none}
+.todo.done{color:#aaa;text-decoration:line-through}
+.todo-text{flex:1}
+.list-menu{position:absolute;right:12px;top:72px;background:rgba(255,255,255,.96);border-radius:20px;box-shadow:var(--shadow);z-index:20;width:245px;overflow:hidden}
+.list-menu button{display:block;width:100%;text-align:left;padding:16px 20px;border-bottom:1px solid #eee;font-size:17px}
+.empty{height:100%;display:flex;align-items:flex-start;padding:25px;color:#aaa;font-size:18px}
+.fab{position:absolute;right:22px;bottom:22px;width:56px;height:56px;border-radius:50%;background:#efe6df;box-shadow:var(--shadow);font-size:34px;z-index:10}
+.calendar{padding:15px 18px}
+.cal-head{display:flex;justify-content:space-between;align-items:center;font-size:21px;font-weight:700;margin-bottom:18px}
+.cal-head button{font-size:30px;color:#f06068}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;text-align:center}
+.grid .wd{color:#bbb;font-size:14px;padding-bottom:5px}
+.grid button{height:45px;font-size:18px;border-radius:50%}
+.grid button.sel{background:#f0646b;color:white}
+.modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.12);z-index:30;display:flex;align-items:flex-end}
+.modal{background:white;width:100%;border-radius:24px 24px 0 0;padding:24px 18px 30px;box-shadow:0 -8px 30px rgba(0,0,0,.08)}
+.modal h3{margin:0 0 18px;font-size:23px}
+.palette{padding:25px}
+.palette h2{font-size:25px}
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.swatch{height:90px;border-radius:18px;border:2px solid transparent;box-shadow:var(--shadow)}
+.swatch.sel{border-color:#111}
+.book-wrap{height:100%;background:#f2eee7;display:flex;flex-direction:column}
+.book-title{text-align:center;font-size:26px;font-weight:700;padding:25px 0 10px}
+.book-stage{flex:1;display:flex;align-items:center;justify-content:center;perspective:1200px;padding:12px 12px 30px;overflow:hidden}
+.book{width:min(94%,430px);height:min(74vh,620px);display:grid;grid-template-columns:1fr 1fr;filter:drop-shadow(0 14px 22px rgba(0,0,0,.10));position:relative}
+.page{background:#fffdf9;padding:30px 20px;overflow:hidden;position:relative}
+.page.left{border-radius:20px 3px 3px 20px;transform-origin:right center;border-right:1px solid #e4ded6}
+.page.right{border-radius:3px 20px 20px 3px;transform-origin:left center}
+.page .weekno{font-size:15px;border-bottom:1px solid #ddd6d0;padding-bottom:12px}
+.page h1{font-size:30px;margin:10px 0 20px}
+.page .datebig{font-size:22px;font-weight:700}
+.page .weekday{font-size:14px}
+.page .rule{height:1px;background:#ddd6d0;margin:22px 0}
+.page[contenteditable="true"]{outline:none}
+.book-controls{height:68px;background:var(--bar);display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-weight:700}
+.book-controls button{font-size:18px}
+.edit-hint{position:absolute;bottom:16px;left:0;right:0;text-align:center;color:#cfc9c2;font-size:15px;pointer-events:none}
+.editing{outline:2px dashed #ddd0c7}
+.note-editor{position:absolute;inset:0;background:rgba(248,246,242,.98);z-index:50;padding:35px 22px}
+.note-editor textarea{width:100%;height:calc(100% - 55px);border:0;outline:0;background:transparent;font-size:20px;line-height:1.7;resize:none}
+.note-editor .save{position:absolute;right:18px;top:15px;background:white;border-radius:14px;padding:11px 28px;font-weight:700;box-shadow:var(--shadow)}
+@media(min-width:700px){.app{height:860px;margin-top:20px;border-radius:24px;box-shadow:0 20px 60px #0006}.top{border-radius:24px 24px 0 0}}
+</style>
+
+<style>
+@keyframes turnNext{0%{transform:rotateY(0deg)}45%{transform:rotateY(-8deg) scale(.985)}100%{transform:rotateY(0deg)}}
+@keyframes turnPrev{0%{transform:rotateY(0deg)}45%{transform:rotateY(8deg) scale(.985)}100%{transform:rotateY(0deg)}}
+.book.turn-next{animation:turnNext .38s ease both}.book.turn-prev{animation:turnPrev .38s ease both}
+@media (max-width:390px){.day{padding-left:13px}.day .date{font-size:30px}.daytask{left:103px;font-size:15px}.todos{padding-left:9px;padding-right:9px}.todo{font-size:16px}.book{width:96%;height:72vh}.page{padding:25px 15px}.page h1{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top" id="top"></header>
+  <main class="view" id="view"></main>
+  <nav class="nav">
+    <button data-nav="week" aria-label="日程">◉</button>
+    <button data-nav="palette" aria-label="主题">◌</button>
+    <button data-nav="calendar" aria-label="日历">▦</button>
+    <button data-nav="journal" aria-label="手帐">▢</button>
+  </nav>
+</div>
+<script>
+const KEY='goalday-personal-v1';
+const themes=[
+ {name:'奶油',bg:'#f8f6f2',bar:'#e9ded7',nav:'#e9ded7',accent:'#efd47b',accent2:'#f29db2',ink:'#171717'},
+ {name:'夜间',bg:'#1f2023',bar:'#292b30',nav:'#292b30',accent:'#a6a9b8',accent2:'#ff7582',ink:'#f2f2f2'},
+ {name:'樱粉',bg:'#fff8fa',bar:'#f5dfe6',nav:'#f5dfe6',accent:'#ee9ab6',accent2:'#e65f7d',ink:'#1b1719'},
+ {name:'纸张',bg:'#ead1ad',bar:'#d9b486',nav:'#d9b486',accent:'#f0d36e',accent2:'#e98c73',ink:'#2b2119'}
+];
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{
+ date:'2026-09-16', nav:'week', list:0, theme:0, selected:'2026-09-16',
+ lists:[
+  {name:'9月｜每天一件幸福的小事',color:'#efd47b',items:['给月末的自己写一封信','存一笔钱','整理衣柜','看一部综艺','看一本新书 📖','喝一杯秋季限定饮品','黄昏骑行','逛一次市集','教师节，感谢老师','清理一波关注的…','记录本月3件有感…','换一套新的床上用品','买一套新衣服','拍一场日落','养成一个好习惯','做一次全面护肤','买一本喜欢的书','听播客','睡前养生泡脚','吃月饼 🥮','打卡小众书店','菜市场买菜','自制蜂蜜柚子茶','练字静心'],done:[]},
+  {name:'日程指南',color:'#f29db2',items:['安排本周重要事项','整理课程表','预留休息时间'],done:[]},
+  {name:'清单指南',color:'#35584f',items:['牛奶','水果','洗衣液','纸巾','日用品','书籍','礼物','药品','零食','充电线','电池','雨伞'],done:[0,2]}
+ ],
+ placed:{},
+ notes:{}
+};
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function theme(){let t=themes[state.theme];for(const k of ['bg','bar','nav','accent','accent2','ink'])document.documentElement.style.setProperty('--'+k,t[k])}
+function dObj(s){let [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
+function iso(dt){return dt.toISOString().slice(0,10)}
+function fmt(s){let d=dObj(s);return `${d.getMonth()+1}月${d.getDate()}日`}
+function weekStart(s){let d=dObj(s), day=d.getDay(); let diff=day===0?-6:1-day; d.setDate(d.getDate()+diff);return d}
+function daysOfWeek(s){let d=weekStart(s),a=[];for(let i=0;i<7;i++){let x=new Date(d);x.setDate(d.getDate()+i);a.push(iso(x))}return a}
+function top(){let t=document.getElementById('top');let items=state.nav==='journal'?['日程','记录','清单','38周']:['38周','记录','清单','习惯'];t.innerHTML=items.map((x,i)=>`<button class="${(i===0&&state.nav!=='journal')||(i===3&&state.nav==='journal')?'active':''}" data-top="${i}">${x}${i===0?' ▾':''}</button>${i<3?'<span class="sep">|</span>':''}`).join('')}
+function render(){theme();top();let v=document.getElementById('view'); if(state.nav==='week')renderWeek(v); if(state.nav==='palette')renderPalette(v); if(state.nav==='calendar')renderCalendar(v); if(state.nav==='journal')renderJournal(v);document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===state.nav))}
+function renderWeek(v){
+ let days=daysOfWeek(state.selected), list=state.lists[state.list];
+ let rows=days.map(s=>{let d=dObj(s), dow=['周日','周一','周二','周三','周四','周五','周六'][d.getDay()];let p=state.placed[s];let txt=p?list.items[p.index]:'';let done=p?list.done.includes(p.index):false;return `<div class="day ${s===state.selected?'today':''}" data-day="${s}" data-drop="${s}"><div class="date">${d.getDate()}</div><div class="dow">${dow}</div>${txt?`<div class="daytask ${done?'done':''}"><span class="sq">✓</span>${txt}</div>`:''}</div>`}).join('');
+ v.innerHTML=`<div class="week"><section class="days">${rows}</section><aside class="todos"><div class="list-select" id="listSelect"><span class="dot" style="background:${list.color}"></span><span>${list.name}</span><span style="margin-left:auto">⌄</span></div>${list.items.map((x,i)=>`<div class="todo ${list.done.includes(i)?'done':''}" draggable="true" data-item="${i}"><span class="box"></span><span class="todo-text">${x}</span></div>`).join('')}</aside></div><button class="fab" id="add">＋</button>`;
+ document.getElementById('listSelect').onclick=()=>showListMenu();
+ document.querySelectorAll('.todo').forEach(el=>{el.onclick=()=>toggleTodo(+el.dataset.item);el.ondragstart=e=>e.dataTransfer.setData('text/plain',el.dataset.item)});
+ document.querySelectorAll('[data-drop]').forEach(el=>{el.ondragover=e=>e.preventDefault();el.ondrop=e=>{e.preventDefault();place(+e.dataTransfer.getData('text/plain'),el.dataset.drop)};el.onclick=()=>{let i=prompt('输入要放到 '+fmt(el.dataset.drop)+' 的清单序号（从0开始），或留空取消');if(i!==null&&i!=='')place(+i,el.dataset.drop)}});
+ document.getElementById('add').onclick=()=>{let x=prompt('新增清单事项');if(x){list.items.push(x);save();render()}};
+}
+function showListMenu(){let box=document.createElement('div');box.className='list-menu';box.innerHTML=state.lists.map((l,i)=>`<button data-i="${i}">${i===state.list?'✓ ':''}${l.name}</button>`).join('');document.getElementById('view').appendChild(box);box.onclick=e=>{let b=e.target.closest('button');if(b){state.list=+b.dataset.i;save();render()}}}
+function toggleTodo(i){let l=state.lists[state.list];if(l.done.includes(i))l.done=l.done.filter(x=>x!==i);else l.done.push(i);save();render()}
+function place(i,s){let l=state.lists[state.list];if(i>=0&&i<l.items.length){state.placed[s]={list:state.list,index:i};state.selected=s;save();render()}}
+function renderPalette(v){v.innerHTML=`<div class="palette"><h2>主题颜色</h2><p style="color:var(--muted)">选择你喜欢的手帐颜色。</p><div class="swatches">${themes.map((t,i)=>`<button class="swatch ${i===state.theme?'sel':''}" data-theme="${i}" style="background:${t.bg};border-color:${i===state.theme?'#111':'transparent'}"><div style="height:28px;background:${t.bar};border-radius:15px 15px 0 0"></div><div style="padding:24px 10px;text-align:left;color:${t.ink}">${t.name}</div></button>`).join('')}</div></div>`;v.querySelectorAll('[data-theme]').forEach(b=>b.onclick=()=>{state.theme=+b.dataset.theme;save();render()})}
+function renderCalendar(v){let d=dObj(state.selected),y=d.getFullYear(),m=d.getMonth();let first=new Date(y,m,1),start=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate();let cells=[];for(let i=0;i<start;i++)cells.push('<span></span>');for(let i=1;i<=days;i++){let s=iso(new Date(y,m,i));cells.push(`<button class="${s===state.selected?'sel':''}" data-date="${s}">${i}</button>`)}v.innerHTML=`<div class="calendar"><div class="cal-head"><span>${y}年 ${m+1}月</span><span><button id="prev">‹</button><button id="next">›</button></span></div><div class="grid">${['周一','周二','周三','周四','周五','周六','周日'].map(x=>`<div class="wd">${x}</div>`).join('')}${cells.join('')}</div></div>`;v.querySelectorAll('[data-date]').forEach(b=>b.onclick=()=>{state.selected=b.dataset.date;state.nav='week';save();render()});document.getElementById('prev').onclick=()=>{let x=new Date(y,m-1,1);state.selected=iso(x);renderCalendar(v)};document.getElementById('next').onclick=()=>{let x=new Date(y,m+1,1);state.selected=iso(x);renderCalendar(v)}}
+let jPage=0;
+function renderJournal(v){let days=daysOfWeek(state.selected), start=jPage;let left,right;if(start===0){left=`<div class="weekno">${dObj(days[0]).getMonth()+1}月 ｜ 第${Math.ceil(dObj(days[0]).getDate()/7)}周</div><h1>本周概览</h1>${days.map(s=>`<div class="rule"></div><div class="datebig">${dObj(s).getDate()}</div><div class="weekday">${['周日','周一','周二','周三','周四','周五','周六'][dObj(s).getDay()]}</div>`).join('')}`;right=`<div class="weekno">${fmt(days[0])}—${fmt(days[6])}</div><h1>这一周</h1><div class="rule"></div><div style="color:#aaa;line-height:1.8">点击任意页面开始记录。<br>完成的清单事项会自动成为当天的小卡片。</div>`}else{let s=days[(start-1)%7],note=state.notes[s]||'';left=`<div class="weekno">${fmt(s)}</div><h1>${dObj(s).getDate()} <small style="font-size:15px;font-weight:400">${['周日','周一','周二','周三','周四','周五','周六'][dObj(s).getDay()]}</small></h1><div class="rule"></div>${note?note.replace(/\\n/g,'<br>'):'<div style="color:#cfc9c2;margin-top:80px;text-align:center">点击页面开始记录</div>'}`;right=`<div class="weekno">当日记录</div><h1>今日</h1><div class="rule"></div>${Object.values(state.placed).filter(p=>p).length?'<div style="color:#777">清单完成事项会显示在这里。</div>':'<div style="color:#cfc9c2">还没有自动事件卡片</div>'}`}v.innerHTML=`<div class="book-wrap"><div class="book-title">${start===0?'9月':'日记'}</div><div class="book-stage"><div class="book" id="book"><article class="page left" id="pageL">${left}</article><article class="page right" id="pageR">${right}</article><div class="edit-hint">点击页面开始书写</div></div></div><div class="book-controls"><button id="back">‹</button><b>${start===0?'2026':'第'+start+'页'}</b><button id="forward">›</button></div></div>`;document.getElementById('pageL').onclick=()=>editNote(days[(Math.max(1,start)-1)%7]);document.getElementById('pageR').onclick=()=>editNote(days[(Math.max(1,start)-1)%7]);document.getElementById('back').onclick=()=>{jPage=Math.max(0,jPage-1);renderJournal(v)};document.getElementById('forward').onclick=()=>{jPage=Math.min(7,jPage+1);renderJournal(v)}}
+function editNote(s){let overlay=document.createElement('div');overlay.className='note-editor';overlay.innerHTML=`<button class="save">保存</button><textarea placeholder="点击输入">${state.notes[s]||''}</textarea>`;document.getElementById('view').appendChild(overlay);overlay.querySelector('.save').onclick=()=>{state.notes[s]=overlay.querySelector('textarea').value;save();overlay.remove();render()}}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{state.nav=b.dataset.nav;save();render()});
+document.getElementById('top').onclick=e=>{};
+render();
+</script>
+
+<script>
+if ('serviceWorker' in navigator && location.protocol !== 'file:') { navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
+</script>
+</body>
+</html>
